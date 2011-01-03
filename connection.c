@@ -1,4 +1,6 @@
-#define MAX_BUF 640000
+#include "common.h"
+#include "lib2ch.h"
+#include "connection.h"
 
 char wr_buf[MAX_BUF+1];
 int  wr_index;
@@ -40,12 +42,14 @@ size_t connection(char *url, char *buf)
 
   iconv(icd, &p_src, &n_src, &p_dst, &n_dst);
   *p_dst = '\0';
-
+  
+  
   return n_dst;
 }
 
 void connection_close(void)
 {
+  wr_index = 0;
   curl_easy_cleanup(curl);
   iconv_close(icd);
 }
