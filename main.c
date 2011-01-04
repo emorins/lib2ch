@@ -18,25 +18,24 @@ int main(int argc, char *args[])
   Board board;
   lib2ch_board_init(&board, &ch, "kamome", "hikky");
 
-  Thread *threads[1024];
-  lib2ch_get_threads(&board, threads);
-  
-  int i = 0;
-  while(1){
-    if (threads[i] == NULL) break;
-    printf("%d:%s=%s\n", i, threads[i]->no, threads[i]->title);
-    i++;
+  Thread thread;
+  lib2ch_thread_init(&board);
+  while (1){
+    if (lib2ch_get_thread(&board, &thread) == -1) {
+      break;
     }
+    printf("%s:%s\n", thread.no, thread.title);
+  }
   
   Response response;
-  lib2ch_response_init(threads[0]);
-
+  lib2ch_response_init(&thread);
   while (1){
-    if (lib2ch_get_response(threads[0], &response) == -1) {
+    if (lib2ch_get_response(&thread, &response) == -1) {
       break;
     }
     printf("%s:%s\n", response.name, response.subject);
   }
+  
 
   return 0;
 }

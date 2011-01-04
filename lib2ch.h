@@ -40,12 +40,13 @@ typedef struct
 int lib2ch_init(Ch *ch);
 int lib2ch_board_init(Board *board, Ch *ch, char *server, char *name);
 
-int lib2ch_thread_init(Thread *thread, Board *board, char *title, char *no);
-int lib2ch_get_threads(Board *board, Thread *thread[1024]);
+int lib2ch_thread_init(Board *board);
+int lib2ch_set_thread(Thread *thread, Board *board, char *title, char *no);
+int lib2ch_get_thread(Board *board, Thread *thread);
 
 int lib2ch_response_init(Thread *thread);
 int lib2ch_set_response(Response *response, Thread *thread, char *name, char *mail, char *id, char *date, char *subject);
-int lib2ch_get_response(Thread *thread, Response *responses);
+int lib2ch_get_response(Thread *thread, Response *response);
 
 void lib2ch_stok(char *sua[1024], char *Busu, char *de);
 void lib2ch_strstr(char *sua[1024], char *Busu, char *de);

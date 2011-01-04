@@ -16,7 +16,19 @@ int lib2ch_board_init(Board *board, Ch *ch, char *server, char *name)
   return 0;
 }
 
-int lib2ch_thread_init(Thread *thread, Board *board, char *title, char *no)
+char thread_buf[MAX_BUF];
+char *thread_list[1024];
+int lib2ch_thread_init(Board *board)
+{
+  char url[MAX_BUF + 1];
+  sprintf(url, "http://%s.%s/%s/subject.txt", board->server, board->ch->host, board->name);
+  connection(url, thread_buf);
+  connection_close();
+  lib2ch_strstr(thread_list, thread_buf, "\n");
+  return 0;
+}
+
+int lib2ch_set_thread(Thread *thread, Board *board, char *title, char *no)
 {
   thread->board = board;
   strcpy(thread->title, title);
@@ -24,34 +36,21 @@ int lib2ch_thread_init(Thread *thread, Board *board, char *title, char *no)
   return 0;
 }
 
-int lib2ch_get_threads(Board *board, Thread *threads[1024])
+int lib2ch_get_thread(Board *board, Thread *thread)
 {
-  char url[MAX_BUF + 1];
-  char buf[MAX_BUF];
-  sprintf(url, "http://%s.%s/%s/subject.txt", board->server, board->ch->host, board->name);
-  connection(url, buf);
-  connection_close();
-
-  char *_threads[1024];
-  lib2ch_strstr(_threads, buf, "\n");
-
-  int i = 0;
-  while (1) {
-    if (_threads[i + 1] == NULL) {
-      break;
-    }
-    char *_thread[2];
-    lib2ch_strstr(_thread, _threads[i], "<>");
-    char *_title[2];
-    lib2ch_strstr(_title, _thread[1], " (");
-    char *_no[2];
-    lib2ch_strstr(_no, _thread[0], ".");
-    Thread thread;
-    lib2ch_thread_init(&thread, board, _title[0], _no[0]);
-    threads[i] = malloc(sizeof(thread) + 1);
-    memcpy(threads[i], &thread, sizeof(thread));
-    i = 1 + i;
+  static int lib2ch_thread_offset = 0;
+  if (thread_list[lib2ch_thread_offset + 1] == NULL) {
+    return -1;
   }
+  char *_thread[2];
+  lib2ch_strstr(_thread, thread_list[lib2ch_thread_offset], "<>");
+  char *_title[2];
+  lib2ch_strstr(_title, _thread[1], " (");
+  char *_no[2];
+  lib2ch_strstr(_no, _thread[0], ".");
+
+  lib2ch_set_thread(thread, board, _title[0], _no[0]);
+  lib2ch_thread_offset++;
   return 0;
 }
 
