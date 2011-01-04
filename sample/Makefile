@@ -1,2 +1,3 @@
-LDFLAGS = -L/usr/lib -lcurl -llib2ch
-main : main.c 
+CFLAGS = -g
+LDFLAGS = -L/usr/lib -lcurl
+main : main.c ../src/lib2ch.c ../src/connection.c
