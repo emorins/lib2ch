@@ -16,47 +16,58 @@ int lib2ch_board_init(Board *board, Ch *ch, char *server, char *name)
   return 0;
 }
 
-int lib2ch_thread_init(Thread *thread, Board *board, char *title, int no)
+int lib2ch_thread_init(Thread *thread, Board *board, char *title, char *no)
 {
   thread->board = board;
   strcpy(thread->title, title);
-  thread->no = no;
+  strcpy(thread->no, no);
   return 0;
 }
 
-size_t lib2ch_get_threads(Board *board, Thread *threads[1024])
+int lib2ch_get_threads(Board *board, Thread *threads[1024])
 {
   char url[MAX_BUF + 1];
-  size_t size;
   char buf[MAX_BUF];
   sprintf(url, "http://%s.%s/%s/subject.txt", board->server, board->ch->host, board->name);
-  size = connection(url, buf);
+  connection(url, buf);
   connection_close();
-  
+
   char *_threads[1024];
-  lib2ch_stok(_threads, buf, "\n");
+  lib2ch_strstr(_threads, buf, "\n");
+
   int i = 0;
   while (1) {
-    if (_threads[i] == NULL) {
+    if (_threads[i + 1] == NULL) {
       break;
     }
-    char *_thread[1];
-    lib2ch_stok(_thread, _threads[i], "<>");
-    char *_title[1];
-    lib2ch_stok(_title, _thread[1], "(");
-    char *_no[1];
-    lib2ch_stok(_no, _thread[0], ".");
-
+    char *_thread[2];
+    lib2ch_strstr(_thread, _threads[i], "<>");
+    char *_title[2];
+    lib2ch_strstr(_title, _thread[1], " (");
+    char *_no[2];
+    lib2ch_strstr(_no, _thread[0], ".");
     Thread thread;
-    lib2ch_thread_init(&thread, board, _title[0], atoi(_no[0]));
+    lib2ch_thread_init(&thread, board, _title[0], _no[0]);
     threads[i] = malloc(sizeof(thread) + 1);
     memcpy(threads[i], &thread, sizeof(thread));
-    i = i + 1;
+    i = 1 + i;
   }
-  return size;
+  return 0;
 }
 
-int lib2ch_response_init(Response *response, Thread *thread, char *name, char *mail, char *id, char *date, char *subject)
+char response_buf[MAX_BUF];
+char *response_list[1024];
+int lib2ch_response_init(Thread *thread)
+{
+  char url[MAX_BUF + 1];
+  sprintf(url, "http://%s.%s/%s/dat/%s.dat", thread->board->server, thread->board->ch->host, thread->board->name, thread->no);
+  connection(url, response_buf);
+  connection_close();
+  lib2ch_strstr(response_list, response_buf, "\n");
+  return 0;
+}
+
+int lib2ch_set_response(Response *response, Thread *thread, char *name, char *mail, char *id, char *date, char *subject)
 {
   response->thread = thread;
   strcpy(response->name, name);
@@ -67,47 +78,21 @@ int lib2ch_response_init(Response *response, Thread *thread, char *name, char *m
   return 0;
 }
 
-size_t lib2ch_get_responses(Thread *thread, Response *responses[1024])
+int lib2ch_get_response(Thread *thread, Response *response)
 {
-  char url[MAX_BUF + 1];
-  size_t size;
-  char buf[MAX_BUF];
-  sprintf(url, "http://%s.%s/%s/dat/%d.dat", thread->board->server, thread->board->ch->host, thread->board->name, thread->no);
-  size = connection(url, buf);
-  connection_close();
-  
-  char *_responses[1024];
-  lib2ch_stok(_responses, buf, "\n");
+  static int lib2ch_response_offset = 0;
 
-  int i = 0;
-  while (1) {
-    if (_responses[i] == NULL) {
-      break;
-    }
-    char *_res[4];
-    lib2ch_strstr(_res, _responses[i], "<>");
-    char *_id[1];
-    lib2ch_strstr(_id, _res[2], "ID:");
-
-    Response response;
-    lib2ch_response_init(&response, thread, _res[0], _res[1], _id[1], _id[0], _res[3]);
-    responses[i] = malloc(sizeof(response) + 1);
-    memcpy(responses[i], &response, sizeof(response));
-    i = i + 1;
+  if (response_list[lib2ch_response_offset + 1] == NULL) {
+    return -1;
   }
-  return size;
-}
+  char *_res[5];
+  lib2ch_strstr(_res, response_list[lib2ch_response_offset], "<>");
+  char *_id[3];
+  lib2ch_strstr(_id, _res[2], "ID:");
 
-size_t lib2ch_get_thread(char *buf, char *server, char *board, char *thread)
-{
-  char target_url[MAX_BUF + 1];
-  sprintf(target_url, "http://%s.2ch.net/%s/dat/%s.dat", server, board, thread);
-
-  size_t dat_size;
-  dat_size = connection(target_url, buf);
-
-  connection_close();
-  return dat_size;
+  lib2ch_set_response(response, thread, _res[0], _res[1], _id[1], _id[0], _res[3]);
+  lib2ch_response_offset++;
+  return 0;
 }
 
 void lib2ch_stok(char *sua[1024], char *Busu, char *de)
