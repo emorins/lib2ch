@@ -93,7 +93,6 @@ size_t lib2ch_get_responses(Thread *thread, Response *responses[1024])
     lib2ch_response_init(&response, thread, _res[0], _res[1], _id[1], _id[0], _res[3]);
     responses[i] = malloc(sizeof(response) + 1);
     memcpy(responses[i], &response, sizeof(response));
-
     i = i + 1;
   }
   return size;

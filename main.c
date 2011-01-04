@@ -10,32 +10,44 @@ int main(int argc, char *args[])
     return -1;
   }
   
+  int i = 0;
   Ch ch;
   lib2ch_init(&ch);
 
-
   Board board;
   lib2ch_board_init(&board, &ch, "kamome", "hikky");
-  printf("board=%s\n", board.server);
-  printf("board=%s\n", board.name);
 
   Thread *threads[1024];
   size_t board_size;
   board_size = lib2ch_get_threads(&board, threads);
-  printf("title=%s\nno=%d\n", threads[0]->title, threads[0]->no);
-  printf("title=%s\nno=%d\n", threads[1]->title, threads[1]->no);
-  printf("title=%s\nno=%d\n", threads[2]->title, threads[2]->no);
-
+  
+  i = 0;
+  /*
+  while(1){
+    if (threads[i] == NULL) break;
+    printf("%d:%d=%s\n", i, threads[i]->no, threads[i]->title);
+    i++;
+  }
+  */
 
   Response *responses[1024];
   size_t thread_size;
   thread_size =lib2ch_get_responses(threads[0], responses);
 
-  printf("%s\n", responses[0]->name);
-  printf("%s\n", responses[0]->id);
-  printf("%s\n", responses[0]->date);
-  printf("%s\n", responses[0]->subject);
-  printf("%s\n", responses[0]->mail);
-  
+  i = 0;
+  while(1){
+    i++;
+    if (responses[i] == NULL){
+      printf("--------------%d\n", i);
+      //      printf("%s\n", responses[i-1]->name);
+      //      printf("%s\n", responses[i-1]->id);
+      //      printf("%s\n", responses[i-1]->date);
+      //      printf("%s\n", responses[i-1]->subject);
+      //      printf("%s\n", responses[i-1]->mail);
+      break;
+    }
+  }
+
+ 
   return 0;
 }

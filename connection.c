@@ -20,10 +20,9 @@ size_t write_data( void *buffer, size_t size, size_t nmemb, void *userp )
   return segsize;
 }
 
-size_t connection(char *url, char *buf)
+int connection(char *url, char *buf)
 {
   CURLcode res;
-
   curl = curl_easy_init();
   curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
   curl_easy_setopt(curl, CURLOPT_URL, url);
@@ -31,10 +30,13 @@ size_t connection(char *url, char *buf)
   curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0);
   res = curl_easy_perform(curl);
 
+  
   char *p_src, *p_dst;
   size_t n_src, n_dst;
   icd = iconv_open("UTF-8", "Shift_JIS");
-  
+  strcpy(buf, wr_buf);
+ 
+  /*
   p_src = wr_buf;
   p_dst = buf;
   n_src = strlen(wr_buf);
@@ -42,9 +44,10 @@ size_t connection(char *url, char *buf)
 
   iconv(icd, &p_src, &n_src, &p_dst, &n_dst);
   *p_dst = '\0';
-  
-  
   return n_dst;
+  */
+
+  return 0;
 }
 
 void connection_close(void)
