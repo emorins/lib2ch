@@ -1,2 +1,4 @@
+CFLAGS = -dynamiclib
 LDFLAGS = -L/usr/lib -lcurl
-src/main : src/main.c src/lib2ch.c src/connection.c
+lib2ch.dylib : lib2ch.c connection.c
+    gcc -o lib2ch.dylib lib2ch.c connection.c

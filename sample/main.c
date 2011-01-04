@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "lib2ch.h"
+#include <lib2ch.h>
 
 #define MAX_BUF 640000
 
