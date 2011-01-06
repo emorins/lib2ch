@@ -3,6 +3,7 @@
 
 #ifndef __LIB2CH_H__
 #define __LIB2CH_H__
+#endif
 
 #ifndef MAX_BUF
 #define MAX_BUF 640000
