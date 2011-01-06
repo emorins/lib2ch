@@ -1,6 +1,9 @@
 #include "common.h"
 #include "connection.h"
 
+#ifndef __LIB2CH_H__
+#define __LIB2CH_H__
+
 #ifndef MAX_BUF
 #define MAX_BUF 640000
 #endif
