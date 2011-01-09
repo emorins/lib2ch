@@ -1,4 +1,4 @@
-#include "lib2ch.h"
+#include "2ch.h"
 
 int lib2ch_init(Ch *ch)
 {
