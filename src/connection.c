@@ -1,5 +1,5 @@
 #include "common.h"
-#include "lib2ch.h"
+#include "2ch.h"
 #include "connection.h"
 
 char wr_buf[MAX_BUF+1];
